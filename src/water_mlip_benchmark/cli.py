@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Sequence
 
 from water_mlip_benchmark.config import load_config
+from water_mlip_benchmark.convert import convert_archive_to_extxyz
 from water_mlip_benchmark.data_sources import probe_zip_archive
 
 
@@ -30,6 +31,13 @@ def _probe_archive(args: argparse.Namespace) -> int:
     return 0
 
 
+def _convert(args: argparse.Namespace) -> int:
+    count = convert_archive_to_extxyz(args.archive, args.output)
+    print(f"converted_frames: {count}")
+    print(f"output: {args.output}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="water-mlip")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -41,6 +49,11 @@ def build_parser() -> argparse.ArgumentParser:
     probe_parser = subparsers.add_parser("probe-archive")
     probe_parser.add_argument("archive", type=Path)
     probe_parser.set_defaults(func=_probe_archive)
+
+    convert_parser = subparsers.add_parser("convert")
+    convert_parser.add_argument("archive", type=Path)
+    convert_parser.add_argument("output", type=Path)
+    convert_parser.set_defaults(func=_convert)
 
     return parser
 
