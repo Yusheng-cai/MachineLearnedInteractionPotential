@@ -12,3 +12,8 @@ water-mlip config-summary configs/experiment.yaml
 water-mlip probe-archive data/raw/training-set.zip
 water-mlip convert data/raw/training-set.zip data/processed/cheng-water.extxyz
 ```
+
+## Documentation
+
+- Design spec: `docs/superpowers/specs/2026-05-18-water-mlip-metric-observable-design.md`
+- First smoke workflow: `docs/workflows/first-smoke-run.md`
