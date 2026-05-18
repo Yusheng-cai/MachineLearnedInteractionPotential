@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "water-mlip-benchmark"
+version = "0.1.0"
+description = "Metric-to-observable benchmark for water MLIPs."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "ase>=3.23.0",
+  "matplotlib>=3.8.0",
+  "numpy>=1.26.0",
+  "pyyaml>=6.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+]
+mace = [
+  "mace-torch>=0.3.6",
+]
+
+[project.scripts]
+water-mlip = "water_mlip_benchmark.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

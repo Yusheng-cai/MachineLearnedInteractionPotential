@@ -1,1 +1,12 @@
 .worktrees/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.DS_Store
+
+data/raw/
+data/processed/
+runs/
+figures/
+*.egg-info/
