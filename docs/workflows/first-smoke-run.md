@@ -38,12 +38,18 @@ water-mlip probe-archive data/raw/training-set.zip
 water-mlip convert data/raw/training-set.zip data/processed/cheng-water.extxyz
 ```
 
-## 6. Generate MACE Training Command
+## 6. Split Dataset
+
+```bash
+water-mlip split data/processed/cheng-water.extxyz data/processed/splits
+```
+
+## 7. Generate MACE Training Command
 
 After splitting the converted file into train and validation files, generate the first MACE command:
 
 ```bash
-water-mlip mace-train-command data/processed/train.extxyz data/processed/valid.extxyz configs/mace-small.yaml runs/mace-small
+water-mlip mace-train-command data/processed/splits/train.extxyz data/processed/splits/valid.extxyz configs/mace-small.yaml runs/mace-small
 ```
 
 The generated command is printed instead of executed so it can be inspected before launching a long run.

@@ -11,6 +11,23 @@ python -m pip install -e ".[dev]"
 water-mlip config-summary configs/experiment.yaml
 water-mlip probe-archive data/raw/training-set.zip
 water-mlip convert data/raw/training-set.zip data/processed/cheng-water.extxyz
+water-mlip split data/processed/cheng-water.extxyz data/processed/splits
+```
+
+## GPU Training
+
+On a Linux machine with an NVIDIA GPU, CUDA-capable PyTorch, and `python3` available:
+
+```bash
+bash scripts/train_mace_gpu.sh
+```
+
+The script creates `.venv`, installs `.[dev,mace]`, downloads and verifies the Cheng archive when needed, converts it to extended XYZ, creates deterministic train/validation/test splits, and starts MACE training with `configs/mace-gpu.yaml`.
+
+Useful overrides:
+
+```bash
+RUN_DIR=runs/mace-gpu-large CONFIG_FILE=configs/mace-gpu.yaml bash scripts/train_mace_gpu.sh
 ```
 
 ## Documentation
@@ -27,6 +44,7 @@ pytest -q
 water-mlip config-summary configs/experiment.yaml
 water-mlip probe-archive data/raw/training-set.zip
 water-mlip convert data/raw/training-set.zip data/processed/cheng-water.extxyz
+water-mlip split data/processed/cheng-water.extxyz data/processed/splits
 ```
 
 The `data/` directory is intentionally ignored by git. In the current local checkout, the Cheng archive conversion produces 1,593 frames.

@@ -8,6 +8,7 @@ from water_mlip_benchmark.config import load_config
 from water_mlip_benchmark.convert import convert_archive_to_extxyz
 from water_mlip_benchmark.data_sources import probe_zip_archive
 from water_mlip_benchmark.mace import build_mace_train_command
+from water_mlip_benchmark.split import split_extxyz
 
 
 def _config_summary(args: argparse.Namespace) -> int:
@@ -45,6 +46,20 @@ def _mace_train_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def _split(args: argparse.Namespace) -> int:
+    result = split_extxyz(
+        args.source,
+        args.output_dir,
+        train_fraction=args.train_fraction,
+        validation_fraction=args.valid_fraction,
+        seed=args.seed,
+    )
+    print(f"train: {result.counts['train']} {result.train_file}")
+    print(f"valid: {result.counts['valid']} {result.valid_file}")
+    print(f"test: {result.counts['test']} {result.test_file}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="water-mlip")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -61,6 +76,14 @@ def build_parser() -> argparse.ArgumentParser:
     convert_parser.add_argument("archive", type=Path)
     convert_parser.add_argument("output", type=Path)
     convert_parser.set_defaults(func=_convert)
+
+    split_parser = subparsers.add_parser("split")
+    split_parser.add_argument("source", type=Path)
+    split_parser.add_argument("output_dir", type=Path)
+    split_parser.add_argument("--train-fraction", type=float, default=0.8)
+    split_parser.add_argument("--valid-fraction", type=float, default=0.1)
+    split_parser.add_argument("--seed", type=int, default=20260518)
+    split_parser.set_defaults(func=_split)
 
     mace_parser = subparsers.add_parser("mace-train-command")
     mace_parser.add_argument("train_file", type=Path)

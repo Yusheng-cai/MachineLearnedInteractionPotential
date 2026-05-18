@@ -1,0 +1,16 @@
+name: mace-gpu-water
+model: MACE
+r_max: 5.0
+num_channels: 64
+max_L: 1
+correlation: 2
+batch_size: 8
+max_num_epochs: 400
+valid_batch_size: 8
+default_dtype: float64
+device: cuda
+energy_weight: 1.0
+forces_weight: 100.0
+ema: true
+ema_decay: 0.99
+save_cpu: true
