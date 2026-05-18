@@ -7,6 +7,7 @@ from typing import Sequence
 from water_mlip_benchmark.config import load_config
 from water_mlip_benchmark.convert import convert_archive_to_extxyz
 from water_mlip_benchmark.data_sources import probe_zip_archive
+from water_mlip_benchmark.mace import build_mace_train_command
 
 
 def _config_summary(args: argparse.Namespace) -> int:
@@ -38,6 +39,12 @@ def _convert(args: argparse.Namespace) -> int:
     return 0
 
 
+def _mace_train_command(args: argparse.Namespace) -> int:
+    command = build_mace_train_command(args.train_file, args.valid_file, args.config, args.run_dir)
+    print(" ".join(command))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="water-mlip")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -54,6 +61,13 @@ def build_parser() -> argparse.ArgumentParser:
     convert_parser.add_argument("archive", type=Path)
     convert_parser.add_argument("output", type=Path)
     convert_parser.set_defaults(func=_convert)
+
+    mace_parser = subparsers.add_parser("mace-train-command")
+    mace_parser.add_argument("train_file", type=Path)
+    mace_parser.add_argument("valid_file", type=Path)
+    mace_parser.add_argument("config", type=Path)
+    mace_parser.add_argument("run_dir", type=Path)
+    mace_parser.set_defaults(func=_mace_train_command)
 
     return parser
 
