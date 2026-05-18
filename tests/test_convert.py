@@ -44,3 +44,21 @@ def test_convert_archive_to_extxyz(tmp_path: Path) -> None:
     frames = read(output, ":")
     assert len(frames) == 1
     assert frames[0].info["REF_energy"] == -76.0
+
+
+def test_convert_archive_prefers_runner_data_when_duplicate_formats_exist(tmp_path: Path) -> None:
+    archive = tmp_path / "training-set.zip"
+    output = tmp_path / "converted.extxyz"
+    duplicate_xyz = """3
+Lattice="10.0 0.0 0.0 0.0 10.0 0.0 0.0 0.0 10.0" Properties=species:S:1:pos:R:3 REF_energy=-76.0 pbc="T T T"
+O 0.0 0.0 0.0
+H 0.8 0.0 0.0
+H 0.0 0.8 0.0
+"""
+    with ZipFile(archive, "w") as zip_file:
+        zip_file.writestr("training-set/input.data", RUNNER_TEXT)
+        zip_file.writestr("training-set/dataset_1593.xyz", duplicate_xyz)
+
+    count = convert_archive_to_extxyz(archive, output)
+
+    assert count == 1

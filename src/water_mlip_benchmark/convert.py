@@ -93,9 +93,11 @@ def convert_archive_to_extxyz(archive_path: str | Path, output_path: str | Path)
         extract_dir = Path(tmpdir)
         with ZipFile(archive_path) as zip_file:
             zip_file.extractall(extract_dir)
-        for path in sorted(extract_dir.rglob("*")):
-            if path.is_file():
-                frames.extend(_read_structure_file(path))
+        files = [path for path in sorted(extract_dir.rglob("*")) if path.is_file()]
+        runner_files = [path for path in files if path.name == "input.data"]
+        structure_files = runner_files if runner_files else files
+        for path in structure_files:
+            frames.extend(_read_structure_file(path))
 
     if not frames:
         raise ValueError(f"no supported structure files found in {archive_path}")
