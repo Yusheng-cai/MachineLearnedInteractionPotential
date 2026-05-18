@@ -1,0 +1,20 @@
+project_root: ..
+raw_data_dir: data/raw
+processed_data_dir: data/processed
+runs_dir: runs
+figures_dir: figures
+random_seed: 20260518
+dataset:
+  archive_name: training-set.zip
+  converted_extxyz: cheng-water.extxyz
+  train_fraction: 0.8
+  validation_fraction: 0.1
+  test_fraction: 0.1
+md:
+  temperature_K: 300.0
+  timestep_fs: 0.5
+  equilibration_steps: 1000
+  production_steps: 10000
+  sample_interval: 10
+  rdf_r_max_A: 6.0
+  rdf_bin_width_A: 0.02
