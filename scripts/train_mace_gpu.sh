@@ -23,7 +23,7 @@ source "$VENV_DIR/bin/activate"
 python -m pip install --upgrade pip
 
 echo "Installing PyTorch from: $PYTORCH_INDEX_URL"
-python -m pip install torch torchvision torchaudio --index-url "$PYTORCH_INDEX_URL"
+python -m pip install torch --index-url "$PYTORCH_INDEX_URL"
 python -c "import torch; print(f'torch={torch.__version__}, cuda={torch.version.cuda}, cuda_available={torch.cuda.is_available()}')"
 
 python -m pip install -e ".[dev,mace]"

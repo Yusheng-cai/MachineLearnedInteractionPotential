@@ -10,3 +10,10 @@ def test_gpu_training_script_installs_torch_before_mace() -> None:
     assert "PYTORCH_INDEX_URL" in script
     assert "python -c \"import torch; print" in script
     assert torch_install < mace_install
+
+
+def test_gpu_training_script_does_not_require_torch_audio_packages() -> None:
+    script = Path("scripts/train_mace_gpu.sh").read_text(encoding="utf-8")
+
+    assert "torchaudio" not in script
+    assert "torchvision" not in script
