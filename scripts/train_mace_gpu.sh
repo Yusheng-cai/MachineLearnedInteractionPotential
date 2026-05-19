@@ -13,6 +13,7 @@ RUN_DIR="${RUN_DIR:-runs/mace-gpu}"
 CONFIG_FILE="${CONFIG_FILE:-configs/mace-gpu.yaml}"
 TRAINING_URL="https://archive.materialscloud.org/api/records/eg3pn-1fw83/files/training-set.zip/content"
 EXPECTED_MD5="8cf0da8a72ddcb778529d2869990a53c"
+PYTORCH_INDEX_URL="${PYTORCH_INDEX_URL:-https://download.pytorch.org/whl/cu121}"
 
 if [ ! -d "$VENV_DIR" ]; then
   "$PYTHON_BIN" -m venv "$VENV_DIR"
@@ -20,6 +21,11 @@ fi
 
 source "$VENV_DIR/bin/activate"
 python -m pip install --upgrade pip
+
+echo "Installing PyTorch from: $PYTORCH_INDEX_URL"
+python -m pip install torch torchvision torchaudio --index-url "$PYTORCH_INDEX_URL"
+python -c "import torch; print(f'torch={torch.__version__}, cuda={torch.version.cuda}, cuda_available={torch.cuda.is_available()}')"
+
 python -m pip install -e ".[dev,mace]"
 
 mkdir -p data/raw data/processed "$RUN_DIR"

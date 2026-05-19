@@ -24,6 +24,18 @@ bash scripts/train_mace_gpu.sh
 
 The script creates `.venv`, installs `.[dev,mace]`, downloads and verifies the Cheng archive when needed, converts it to extended XYZ, creates deterministic train/validation/test splits, and starts MACE training with `configs/mace-gpu.yaml`.
 
+By default, the script installs PyTorch from the CUDA 12.1 wheel index:
+
+```bash
+https://download.pytorch.org/whl/cu121
+```
+
+If your workstation needs a different PyTorch CUDA wheel, override it:
+
+```bash
+PYTORCH_INDEX_URL=https://download.pytorch.org/whl/cu124 bash scripts/train_mace_gpu.sh
+```
+
 Useful overrides:
 
 ```bash

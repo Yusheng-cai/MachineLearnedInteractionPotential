@@ -1,0 +1,12 @@
+from pathlib import Path
+
+
+def test_gpu_training_script_installs_torch_before_mace() -> None:
+    script = Path("scripts/train_mace_gpu.sh").read_text(encoding="utf-8")
+
+    torch_install = script.index("python -m pip install torch")
+    mace_install = script.index('python -m pip install -e ".[dev,mace]"')
+
+    assert "PYTORCH_INDEX_URL" in script
+    assert "python -c \"import torch; print" in script
+    assert torch_install < mace_install
