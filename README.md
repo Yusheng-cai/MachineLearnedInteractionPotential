@@ -24,19 +24,23 @@ bash scripts/train_mace_gpu.sh
 
 The script creates `.venv`, installs CUDA-enabled PyTorch, installs `.[dev,mace]`, downloads and verifies the Cheng archive when needed, converts it to extended XYZ, creates deterministic train/validation/test splits, and starts MACE training with `configs/mace-gpu.yaml`.
 
-By default, the script installs PyTorch from the CUDA 12.1 wheel index:
+By default, the script installs `torch==2.5.1` from the CUDA 12.1 wheel index:
 
 ```bash
 https://download.pytorch.org/whl/cu121
 ```
 
+That is intentional for a workstation whose NVIDIA driver reports CUDA 12.2, because a CUDA 12.1 PyTorch wheel is compatible while CUDA 13.0 is not. The script also refuses to continue if the installed Torch CUDA runtime is newer than `12.2`.
+
 If your workstation needs a different PyTorch CUDA wheel, override it:
 
 ```bash
-PYTORCH_INDEX_URL=https://download.pytorch.org/whl/cu124 bash scripts/train_mace_gpu.sh
+PYTORCH_SPEC=torch==2.4.1 PYTORCH_INDEX_URL=https://download.pytorch.org/whl/cu121 bash scripts/train_mace_gpu.sh
 ```
 
 The training workflow only installs `torch` from the PyTorch CUDA index. It does not install `torchvision` or `torchaudio` because MACE does not need them, and those optional packages can be unavailable for some Python/CUDA combinations.
+
+Use Python 3.10, 3.11, or 3.12 for the pinned CUDA 12.1 Torch wheel. Python 3.13 may force pip toward newer Torch builds.
 
 Useful overrides:
 

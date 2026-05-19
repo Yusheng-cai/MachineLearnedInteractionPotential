@@ -14,6 +14,8 @@ CONFIG_FILE="${CONFIG_FILE:-configs/mace-gpu.yaml}"
 TRAINING_URL="https://archive.materialscloud.org/api/records/eg3pn-1fw83/files/training-set.zip/content"
 EXPECTED_MD5="8cf0da8a72ddcb778529d2869990a53c"
 PYTORCH_INDEX_URL="${PYTORCH_INDEX_URL:-https://download.pytorch.org/whl/cu121}"
+PYTORCH_SPEC="${PYTORCH_SPEC:-torch==2.5.1}"
+MAX_TORCH_CUDA="${MAX_TORCH_CUDA:-12.2}"
 
 if [ ! -d "$VENV_DIR" ]; then
   "$PYTHON_BIN" -m venv "$VENV_DIR"
@@ -23,8 +25,27 @@ source "$VENV_DIR/bin/activate"
 python -m pip install --upgrade pip
 
 echo "Installing PyTorch from: $PYTORCH_INDEX_URL"
-python -m pip install torch --index-url "$PYTORCH_INDEX_URL"
-python -c "import torch; print(f'torch={torch.__version__}, cuda={torch.version.cuda}, cuda_available={torch.cuda.is_available()}')"
+python -m pip install "$PYTORCH_SPEC" --index-url "$PYTORCH_INDEX_URL"
+python - <<PY
+import torch
+
+max_cuda = tuple(int(part) for part in "$MAX_TORCH_CUDA".split("."))
+cuda_version = torch.version.cuda
+print(f"torch={torch.__version__}, cuda={cuda_version}, cuda_available={torch.cuda.is_available()}")
+
+if cuda_version is None:
+    raise SystemExit("Installed Torch is CPU-only; expected a CUDA-enabled build.")
+
+installed_cuda = tuple(int(part) for part in cuda_version.split(".")[:2])
+if installed_cuda > max_cuda:
+    raise SystemExit(
+        f"Torch CUDA runtime {cuda_version} is newer than workstation driver capability $MAX_TORCH_CUDA. "
+        "Set PYTORCH_SPEC/PYTORCH_INDEX_URL to a compatible wheel."
+    )
+
+if not torch.cuda.is_available():
+    raise SystemExit("Torch installed, but CUDA is not available. Check NVIDIA driver and GPU visibility.")
+PY
 
 python -m pip install -e ".[dev,mace]"
 
