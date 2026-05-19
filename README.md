@@ -16,7 +16,7 @@ water-mlip split data/processed/cheng-water.extxyz data/processed/splits
 
 ## GPU Training
 
-On a Linux machine with an NVIDIA GPU, CUDA-capable PyTorch, and `python3` available:
+On a Linux machine with an NVIDIA GPU, CUDA-capable PyTorch, and Python 3.10, 3.11, or 3.12 available:
 
 ```bash
 bash scripts/train_mace_gpu.sh
@@ -41,6 +41,15 @@ PYTORCH_SPEC=torch==2.4.1 PYTORCH_INDEX_URL=https://download.pytorch.org/whl/cu1
 The training workflow only installs `torch` from the PyTorch CUDA index. It does not install `torchvision` or `torchaudio` because MACE does not need them, and those optional packages can be unavailable for some Python/CUDA combinations.
 
 Use Python 3.10, 3.11, or 3.12 for the pinned CUDA 12.1 Torch wheel. Python 3.13 may force pip toward newer Torch builds.
+
+If your default `python3` is Python 3.13, run:
+
+```bash
+rm -rf .venv
+PYTHON_BIN=python3.11 bash scripts/train_mace_gpu.sh
+```
+
+The script tries `python3.12`, `python3.11`, and `python3.10` before plain `python3` when `PYTHON_BIN` is not set.
 
 Useful overrides:
 

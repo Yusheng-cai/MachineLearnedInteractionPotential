@@ -4,7 +4,6 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-PYTHON_BIN="${PYTHON_BIN:-python3}"
 VENV_DIR="${VENV_DIR:-.venv}"
 RAW_ARCHIVE="data/raw/training-set.zip"
 PROCESSED_FILE="data/processed/cheng-water.extxyz"
@@ -16,12 +15,61 @@ EXPECTED_MD5="8cf0da8a72ddcb778529d2869990a53c"
 PYTORCH_INDEX_URL="${PYTORCH_INDEX_URL:-https://download.pytorch.org/whl/cu121}"
 PYTORCH_SPEC="${PYTORCH_SPEC:-torch==2.5.1}"
 MAX_TORCH_CUDA="${MAX_TORCH_CUDA:-12.2}"
+SUPPORTED_PYTHON_PATTERN="3.10|3.11|3.12"
+
+python_minor_version() {
+  "$1" - <<'PY'
+import sys
+
+print(f"{sys.version_info.major}.{sys.version_info.minor}")
+PY
+}
+
+require_supported_python() {
+  local executable="$1"
+  local context="$2"
+  local version
+  version="$(python_minor_version "$executable")"
+
+  case "$version" in
+    3.10|3.11|3.12)
+      echo "$version"
+      ;;
+    *)
+      echo "ERROR: $context uses Python $version, but $PYTORCH_SPEC from $PYTORCH_INDEX_URL requires Python 3.10, 3.11, or 3.12." >&2
+      echo "Install Python 3.11 or 3.12 and rerun with:" >&2
+      echo "  PYTHON_BIN=python3.11 bash scripts/train_mace_gpu.sh" >&2
+      echo "If .venv already exists with the wrong Python, remove it first:" >&2
+      echo "  rm -rf .venv" >&2
+      exit 2
+      ;;
+  esac
+}
+
+if [ -z "${PYTHON_BIN:-}" ]; then
+  for candidate in python3.12 python3.11 python3.10 python3; do
+    if command -v "$candidate" >/dev/null 2>&1; then
+      PYTHON_BIN="$candidate"
+      break
+    fi
+  done
+fi
+
+if [ -z "${PYTHON_BIN:-}" ]; then
+  echo "ERROR: Could not find python3.12, python3.11, python3.10, or python3 on PATH." >&2
+  exit 2
+fi
+
+selected_python_version="$(require_supported_python "$PYTHON_BIN" "$PYTHON_BIN")"
+echo "Using Python: $PYTHON_BIN ($selected_python_version)"
 
 if [ ! -d "$VENV_DIR" ]; then
   "$PYTHON_BIN" -m venv "$VENV_DIR"
 fi
 
 source "$VENV_DIR/bin/activate"
+venv_python_version="$(require_supported_python python "$VENV_DIR")"
+echo "Using virtualenv Python: $venv_python_version"
 python -m pip install --upgrade pip
 
 echo "Installing PyTorch from: $PYTORCH_INDEX_URL"

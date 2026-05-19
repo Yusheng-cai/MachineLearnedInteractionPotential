@@ -26,3 +26,12 @@ def test_gpu_training_script_pins_cuda_12_compatible_torch() -> None:
     assert 'PYTORCH_SPEC="${PYTORCH_SPEC:-torch==2.5.1}"' in script
     assert 'MAX_TORCH_CUDA="${MAX_TORCH_CUDA:-12.2}"' in script
     assert "Torch CUDA runtime" in script
+
+
+def test_gpu_training_script_rejects_unsupported_python_versions() -> None:
+    script = Path("scripts/train_mace_gpu.sh").read_text(encoding="utf-8")
+
+    assert "SUPPORTED_PYTHON_PATTERN" in script
+    assert "python3.12 python3.11 python3.10 python3" in script
+    assert "requires Python 3.10, 3.11, or 3.12" in script
+    assert "rm -rf .venv" in script
